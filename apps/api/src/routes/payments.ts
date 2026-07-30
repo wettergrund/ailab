@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import express from 'express';
 import {
   createIntent,
   listPayments,
@@ -15,9 +16,10 @@ const createIntentSchema = z.object({
   amount: z.number().positive(),
 });
 
+router.post('/webhook', express.raw({ type: 'application/json' }), webhook);
+
 router.use(authMiddleware);
 router.post('/create-intent', validateBody(createIntentSchema), createIntent);
 router.get('/', listPayments);
-router.get('/webhook', webhook);
 
 export default router;

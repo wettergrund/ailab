@@ -25,8 +25,8 @@ export interface TaskResponse {
   status: string;
   assigneeId?: number;
   aiGenerated: boolean;
-  estimatedHours?: string;
-  actualHours?: string;
+  estimatedHours?: number;
+  actualHours?: number;
   createdAt: string;
   updatedAt: string;
 }

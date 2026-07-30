@@ -36,7 +36,16 @@ export async function createPaymentIntent(
   };
 }
 
-export async function handleStripeWebhook(event: unknown): Promise<void> {
+export async function handleStripeWebhook(
+  eventBody: string | Buffer,
+  signatureHeader: string,
+  endpointSecret: string
+): Promise<void> {
+  const event = stripe.webhooks.constructEvent(
+    eventBody,
+    signatureHeader,
+    endpointSecret
+  );
   const intent = (event as { data: { object: { id: string; status: string } } })
     .data.object;
   const status = intent.status === 'succeeded' ? 'succeeded' : 'failed';

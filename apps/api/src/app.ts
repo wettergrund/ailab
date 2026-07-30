@@ -321,7 +321,7 @@ const swaggerDefinition = {
       },
     },
     '/api/payments/webhook': {
-      get: {
+      post: {
         tags: ['Payments'],
         summary: 'Stripe webhook endpoint',
         responses: { '200': { description: 'Webhook received' } },

@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
-const REFRESH_SECRET =
-  process.env.REFRESH_SECRET || 'dev-refresh-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
 const ACCESS_EXPIRY = '15m';
 const REFRESH_EXPIRY = '7d';
 

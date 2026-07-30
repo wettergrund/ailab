@@ -2,8 +2,13 @@ import bcrypt from 'bcrypt';
 import { db } from '@repo/db';
 import { users, NewUser } from '@repo/db';
 import { eq } from 'drizzle-orm';
-import { signAccessToken, signRefreshToken, TokenPayload } from '../utils/jwt';
 import { RegisterRequest, AuthResponse, LoginRequest } from '@repo/types';
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+  TokenPayload,
+} from '../utils/jwt';
 
 const SALT_ROUNDS = 10;
 
@@ -76,5 +81,3 @@ export async function refreshTokens(
     throw new Error('Invalid refresh token');
   }
 }
-
-import { verifyRefreshToken } from '../utils/jwt';

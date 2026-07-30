@@ -28,9 +28,18 @@ export async function listPayments(
 }
 
 export async function webhook(req: Request, res: Response): Promise<void> {
-  const event = req.body;
+  const eventBody = req.body;
+  const signature = req.headers['stripe-signature'];
+  if (!signature || typeof signature !== 'string') {
+    res.status(400).json({ error: 'Missing stripe-signature header' });
+    return;
+  }
   try {
-    await handleStripeWebhook(event);
+    await handleStripeWebhook(
+      eventBody,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
     res.json({ received: true });
   } catch (error) {
     res.status(400).json({
