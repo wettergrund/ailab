@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: tsx watch src/index.ts
+    volumes:
+      - ./apps/api/src:/app/src
+      - ./apps/api/package.json:/app/package.json
+      - ./apps/api/tsconfig.json:/app/tsconfig.json
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL:-postgresql://convoy:convoy@postgres:5432/convoy}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_SECRET: ${JWT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
+    depends_on:
+      - postgres
+      - redis
+
+  ai-engine:
+    build:
+      context: .
+      dockerfile: apps/ai-engine/Dockerfile
+    command: tsx watch src/index.ts
+    volumes:
+      - ./apps/ai-engine/src:/app/src
+      - ./apps/ai-engine/package.json:/app/package.json
+      - ./apps/ai-engine/tsconfig.json:/app/tsconfig.json
+    ports:
+      - '3001:3001'
+      - '9230:9230'
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
+    depends_on:
+      - redis
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    command: next dev -p 3002
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    ports:
+      - '3002:3002'
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+      NEXT_PUBLIC_AI_URL: http://localhost:3001
+    depends_on:
+      - api
+      - ai-engine
