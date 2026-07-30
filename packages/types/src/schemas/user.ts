@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TaskStatus, TaskPriority, UserRole, BidStatus } from "../enums";
+import { UserRole } from "../enums";
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
