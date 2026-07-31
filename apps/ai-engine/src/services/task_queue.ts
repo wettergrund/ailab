@@ -1,10 +1,7 @@
 import { QueueService } from './queue.service';
 import { OpenAIService } from './openai.service';
-import { DecomposeRequest, DecomposeResponse } from '../types/decompose.types';
-import {
-  MatchWorkerRequest,
-  MatchWorkerResponse,
-} from '../types/dispatch.types';
+import { DecomposeRequest } from '../types/decompose.types';
+import { MatchWorkerRequest } from '../types/dispatch.types';
 
 export type TaskHandler = (payload: unknown) => Promise<unknown>;
 

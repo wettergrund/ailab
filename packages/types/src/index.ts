@@ -4,3 +4,4 @@ export * from './task.types';
 export * from './bid.types';
 export * from './payment.types';
 export * from './ai.types';
+export * from './env.schemas';

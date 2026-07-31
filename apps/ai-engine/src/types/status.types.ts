@@ -1,9 +1,9 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const AIStatusSchema = z.object({
-  service: z.literal("ai-engine"),
+  service: z.literal('ai-engine'),
   version: z.string(),
-  status: z.enum(["healthy", "degraded", "unhealthy"]),
+  status: z.enum(['healthy', 'degraded', 'unhealthy']),
   uptime_seconds: z.number().nonnegative(),
   openai_configured: z.boolean(),
   redis_configured: z.boolean(),

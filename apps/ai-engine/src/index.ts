@@ -1,7 +1,5 @@
 import express, { Request, Response, Express } from 'express';
 import { OpenAIService } from './services/openai.service';
-import { QueueService } from './services/queue.service';
-import { TaskQueue } from './services/task_queue';
 import { analyzeTask } from './decompose/task_analyzer';
 import { generateSubtasks } from './decompose/subtask_generator';
 import { rankWorkers } from './dispatch/skill_matcher';
@@ -13,25 +11,19 @@ import {
 } from './types/dispatch.types';
 import { AIStatus } from './types/status.types';
 import { WorkerProfile } from './types/worker.types';
+import { validateEnv } from '@repo/types';
+
+validateEnv(process.env);
 
 const app: Express = express();
 app.use(express.json());
 
 const openai = new OpenAIService({
-  apiKey: process.env.OPENAI_API_KEY ?? '',
+  apiKey: process.env.OPENAI_API_KEY || '',
   model: process.env.OPENAI_MODEL ?? 'gpt-4o',
   temperature: 0.7,
   maxTokens: 4096,
 });
-
-const queue = new QueueService({
-  redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
-  prefix: 'ai_engine',
-  defaultMaxAttempts: 3,
-  visibilityTimeout: 30,
-});
-
-const taskQueue = new TaskQueue(queue, openai);
 
 const startTime = Date.now();
 let totalDecompositions = 0;

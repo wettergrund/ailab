@@ -63,8 +63,8 @@ function formatProject(project: typeof projects.$inferSelect): ProjectResponse {
     clientId: project.clientId,
     name: project.name,
     description: project.description ?? undefined,
-    status: project.status,
-    budget: project.budget ?? undefined,
+    status: project.status as 'active' | 'completed' | 'archived',
+    budget: project.budget ? Number(project.budget) : undefined,
     createdAt: project.createdAt.toISOString(),
     updatedAt: project.updatedAt.toISOString(),
   };

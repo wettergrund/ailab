@@ -57,7 +57,7 @@ export default function AdminDashboard() {
   }
 
   const totalRevenue = payments.reduce(
-    (sum, p) => sum + (p.status === 'succeeded' ? parseFloat(p.amount) : 0),
+    (sum, p) => sum + (p.status === 'succeeded' ? p.amount : 0),
     0
   );
   const activeProjects = projects.filter((p) => p.status === 'active').length;

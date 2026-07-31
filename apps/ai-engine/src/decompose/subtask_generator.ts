@@ -221,7 +221,7 @@ function estimateHoursForPhase(
 function generateSubtaskDescription(
   phase: Phase,
   taskDescription: string,
-  skills: string[]
+  _skills: string[]
 ): string {
   const descriptions: Record<Phase, string> = {
     planning: `Analyze and plan the implementation approach for: ${taskDescription}. Break down requirements and identify dependencies.`,
@@ -233,7 +233,7 @@ function generateSubtaskDescription(
   return descriptions[phase];
 }
 
-function generateDeliverables(phase: Phase, skills: string[]): string[] {
+function generateDeliverables(phase: Phase, _skills: string[]): string[] {
   const deliverables: Record<Phase, string[]> = {
     planning: ['Requirements document', 'Task breakdown', 'Estimation report'],
     setup: ['Config files', 'Environment setup', 'Scaffolded project'],
@@ -259,7 +259,7 @@ function getPriorityForPhase(
 
 function assessQuality(
   subtasks: Subtask[],
-  analyzedTask: AnalyzedTask
+  _analyzedTask: AnalyzedTask
 ): 'low' | 'medium' | 'high' {
   if (subtasks.length === 0) return 'low';
 

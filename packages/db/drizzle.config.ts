@@ -5,8 +5,6 @@ export default defineConfig({
   out: './src/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url:
-      process.env.DATABASE_URL ||
-      'postgres://postgres:postgres@localhost:5432/consult_platform',
+    url: process.env.DATABASE_URL,
   },
 });

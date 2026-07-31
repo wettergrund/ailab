@@ -103,8 +103,7 @@ export function TaskBoard({ tasks, onUpdate }: TaskBoardProps) {
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
 
-  function handleDragStart(_event: DragStartEvent) {
-  }
+  function handleDragStart(_event: DragStartEvent) {}
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;

@@ -42,12 +42,12 @@ pnpm test
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `pnpm dev` | Run all apps in development mode |
-| `pnpm build` | Build all apps |
-| `pnpm lint` | Lint all TypeScript files |
-| `pnpm test` | Run tests for all apps |
+| Script       | Description                             |
+| ------------ | --------------------------------------- |
+| `pnpm dev`   | Run all apps in development mode        |
+| `pnpm build` | Build all apps                          |
+| `pnpm lint`  | Lint all TypeScript files               |
+| `pnpm test`  | Run tests for all apps                  |
 | `pnpm clean` | Remove build artifacts and node_modules |
 
 ## Path Aliases

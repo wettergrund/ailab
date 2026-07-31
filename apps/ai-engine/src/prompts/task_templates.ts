@@ -64,5 +64,8 @@ Return a structured decomposition with subtasks, estimated hours, required skill
 };
 
 export function getTaskTemplate(taskType: string): string {
-  return TASK_TEMPLATES[taskType as keyof typeof TASK_TEMPLATES] ?? TASK_TEMPLATES.feature_development;
+  return (
+    TASK_TEMPLATES[taskType as keyof typeof TASK_TEMPLATES] ??
+    TASK_TEMPLATES.feature_development
+  );
 }

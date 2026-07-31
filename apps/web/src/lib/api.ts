@@ -90,15 +90,25 @@ export const paymentApi = {
 
 export const aiApi = {
   decompose: (taskDescription: string, maxSubtasks?: number) =>
-    api.post('http://localhost:3001/api/ai/decompose', {
-      task_description: taskDescription,
-      max_subtasks: maxSubtasks,
-    }),
+    api.post(
+      process.env.NEXT_PUBLIC_AI_ENGINE_URL
+        ? `${process.env.NEXT_PUBLIC_AI_ENGINE_URL}/api/ai/decompose`
+        : '/api/ai/decompose',
+      {
+        task_description: taskDescription,
+        max_subtasks: maxSubtasks,
+      }
+    ),
   matchWorker: (requiredSkills: string[], estimatedHours: number) =>
-    api.post('http://localhost:3001/api/ai/match-worker', {
-      required_skills: requiredSkills,
-      estimated_hours: estimatedHours,
-    }),
+    api.post(
+      process.env.NEXT_PUBLIC_AI_ENGINE_URL
+        ? `${process.env.NEXT_PUBLIC_AI_ENGINE_URL}/api/ai/match-worker`
+        : '/api/ai/match-worker',
+      {
+        required_skills: requiredSkills,
+        estimated_hours: estimatedHours,
+      }
+    ),
 };
 
 export default api;

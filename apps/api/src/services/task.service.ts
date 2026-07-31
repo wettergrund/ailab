@@ -116,12 +116,14 @@ function formatTask(task: typeof tasks.$inferSelect): TaskResponse {
     projectId: task.projectId,
     title: task.title,
     description: task.description ?? undefined,
-    priority: task.priority,
-    status: task.status,
+    priority: task.priority as 'low' | 'medium' | 'high',
+    status: task.status as 'open' | 'assigned' | 'in_progress' | 'completed',
     assigneeId: task.assigneeId ?? undefined,
     aiGenerated: task.aiGenerated,
-    estimatedHours: task.estimatedHours ?? undefined,
-    actualHours: task.actualHours ?? undefined,
+    estimatedHours: task.estimatedHours
+      ? Number(task.estimatedHours)
+      : undefined,
+    actualHours: task.actualHours ? Number(task.actualHours) : undefined,
     createdAt: task.createdAt.toISOString(),
     updatedAt: task.updatedAt.toISOString(),
   };

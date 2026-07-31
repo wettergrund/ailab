@@ -1,4 +1,5 @@
 import express, { Express } from 'express';
+import cors from 'cors';
 import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
@@ -14,7 +15,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000',
+      url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
       description: 'Development server',
     },
   ],
@@ -339,6 +340,12 @@ export function setupSwagger(app: Express): void {
 
 export function createApp(): Express {
   const app = express();
+  app.use(
+    cors({
+      origin: process.env.CORS_ORIGIN?.split(',') || true,
+      credentials: true,
+    })
+  );
   app.use(express.json());
   app.use(rateLimiter);
   app.use('/api', routes);

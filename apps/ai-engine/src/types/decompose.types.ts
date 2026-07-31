@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const SubtaskSchema = z.object({
   id: z.string().uuid(),
@@ -6,7 +6,7 @@ export const SubtaskSchema = z.object({
   description: z.string().max(5000).optional(),
   estimated_hours: z.number().positive().min(1).max(8),
   required_skills: z.array(z.string()).min(1),
-  priority: z.enum(["low", "medium", "high", "critical"]),
+  priority: z.enum(['low', 'medium', 'high', 'critical']),
   dependencies: z.array(z.string().uuid()).optional().default([]),
   deliverables: z.array(z.string()).optional().default([]),
 });
@@ -18,7 +18,13 @@ export const DecomposeRequestSchema = z.object({
   context: z.string().max(5000).optional(),
   existing_subtasks: z.array(SubtaskSchema).optional().default([]),
   max_subtasks: z.number().int().positive().max(50).optional().default(20),
-  target_hours_per_subtask: z.number().positive().min(1).max(8).optional().default(4),
+  target_hours_per_subtask: z
+    .number()
+    .positive()
+    .min(1)
+    .max(8)
+    .optional()
+    .default(4),
 });
 
 export type DecomposeRequest = z.infer<typeof DecomposeRequestSchema>;
@@ -29,7 +35,7 @@ export const DecomposeResponseSchema = z.object({
   subtasks: z.array(SubtaskSchema),
   total_estimated_hours: z.number().positive(),
   required_skills: z.array(z.string()),
-  decomposition_quality: z.enum(["low", "medium", "high"]),
+  decomposition_quality: z.enum(['low', 'medium', 'high']),
   notes: z.string().optional(),
 });
 

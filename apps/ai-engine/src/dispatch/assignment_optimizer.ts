@@ -3,7 +3,6 @@ import {
   WorkerAvailability,
   Assignment,
 } from '../types/worker.types';
-import { SkillMatchResult } from './skill_matcher';
 
 export interface OptimizationResult {
   assignments: Assignment[];
@@ -89,7 +88,7 @@ export function optimizeAssignments(
   const avgMatchScore =
     scoredWorkers.reduce((sum, w) => sum + w.score, 0) / scoredWorkers.length;
   const totalHoursAssigned = assignments.reduce(
-    (sum, a) => sum + estimatedHours,
+    (sum, _a) => sum + estimatedHours,
     0
   );
   const loadBalanceScore = calculateLoadBalance(workers);

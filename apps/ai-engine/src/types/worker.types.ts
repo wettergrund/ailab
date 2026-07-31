@@ -1,10 +1,10 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const WorkerProfileSchema = z.object({
   worker_id: z.string().uuid(),
   name: z.string(),
   skills: z.array(z.string()),
-  experience_level: z.enum(["junior", "mid", "senior", "lead"]),
+  experience_level: z.enum(['junior', 'mid', 'senior', 'lead']),
   hourly_rate: z.number().positive(),
   max_hours_per_week: z.number().positive().max(80),
   current_hours_this_week: z.number().min(0).max(80),

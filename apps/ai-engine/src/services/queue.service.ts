@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import Redis from 'ioredis';
 
 export interface QueueMessage {
   id: string;
@@ -26,7 +26,9 @@ export class QueueService {
     this.redis = new Redis(config.redisUrl);
   }
 
-  async enqueue(message: Omit<QueueMessage, "id" | "created_at" | "attempts">): Promise<string> {
+  async enqueue(
+    message: Omit<QueueMessage, 'id' | 'created_at' | 'attempts'>
+  ): Promise<string> {
     const id = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     const fullMessage: QueueMessage = {
       id,
@@ -48,7 +50,15 @@ export class QueueService {
     const minScore = 0;
     const maxScore = now + this.config.visibilityTimeout * 1000;
 
-    const items = await this.redis.zrangebyscore(key, minScore, maxScore, "WITHSCORES", "LIMIT", 0, 1);
+    const items = await this.redis.zrangebyscore(
+      key,
+      minScore,
+      maxScore,
+      'WITHSCORES',
+      'LIMIT',
+      0,
+      1
+    );
 
     if (items.length === 0) return null;
 
@@ -58,7 +68,11 @@ export class QueueService {
     await this.redis.zrem(key, messageJson);
 
     const processingKey = `${this.config.prefix}:processing:${message.id}`;
-    await this.redis.setex(processingKey, this.config.visibilityTimeout, messageJson);
+    await this.redis.setex(
+      processingKey,
+      this.config.visibilityTimeout,
+      messageJson
+    );
 
     return message;
   }
@@ -79,7 +93,11 @@ export class QueueService {
       if (requeue && message.attempts < message.max_attempts) {
         message.attempts += 1;
         const key = `${this.config.prefix}:queue`;
-        await this.redis.zadd(key, message.priority + message.attempts, JSON.stringify(message));
+        await this.redis.zadd(
+          key,
+          message.priority + message.attempts,
+          JSON.stringify(message)
+        );
       }
     }
   }

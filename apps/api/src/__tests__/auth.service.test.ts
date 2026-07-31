@@ -3,16 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.stubEnv('JWT_SECRET', 'test-jwt-secret');
 vi.stubEnv('REFRESH_SECRET', 'test-refresh-secret');
 
-const { signAccessToken, signRefreshToken, verifyRefreshToken } =
-  await import('../utils/jwt');
-
 vi.mock('@repo/db', () => {
-  const mockUser = {
-    id: 1,
-    email: 'test@example.com',
-    role: 'client',
-    passwordHash: 'hashed-password',
-  };
   const mockDb = {
     select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
@@ -70,7 +61,7 @@ describe('auth.service', () => {
 
   it('logs in a user with valid credentials', async () => {
     const { loginUser } = await import('../services/auth.service');
-    const mockDb = (await import('@repo/db')).db;
+    const mockDb = (await import('@repo/db')).db as any;
     mockDb.limit.mockResolvedValueOnce([
       {
         id: 1,

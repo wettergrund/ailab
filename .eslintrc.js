@@ -17,5 +17,10 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },
-  ignorePatterns: ['node_modules', 'dist', 'build'],
+  ignorePatterns: [
+    'node_modules',
+    'dist',
+    'build',
+    'packages/db/drizzle.config.ts',
+  ],
 };

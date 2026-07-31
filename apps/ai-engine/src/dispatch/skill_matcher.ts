@@ -1,4 +1,4 @@
-import { WorkerProfile } from "../types/worker.types";
+import { WorkerProfile } from '../types/worker.types';
 
 export interface SkillMatchResult {
   worker_id: string;
@@ -8,7 +8,10 @@ export interface SkillMatchResult {
   extra_skills: string[];
 }
 
-export function matchSkills(requiredSkills: string[], workers: WorkerProfile[]): SkillMatchResult[] {
+export function matchSkills(
+  requiredSkills: string[],
+  workers: WorkerProfile[]
+): SkillMatchResult[] {
   const required = requiredSkills.map((s) => s.toLowerCase());
 
   return workers
@@ -16,9 +19,12 @@ export function matchSkills(requiredSkills: string[], workers: WorkerProfile[]):
       const workerSkills = new Set(worker.skills.map((s) => s.toLowerCase()));
       const matched = required.filter((s) => workerSkills.has(s));
       const missing = required.filter((s) => !workerSkills.has(s));
-      const extra = Array.from(workerSkills).filter((s) => !required.includes(s));
+      const extra = Array.from(workerSkills).filter(
+        (s) => !required.includes(s)
+      );
 
-      const matchScore = required.length > 0 ? matched.length / required.length : 0;
+      const matchScore =
+        required.length > 0 ? matched.length / required.length : 0;
 
       return {
         worker_id: worker.worker_id,

@@ -3,7 +3,7 @@ import { users, projects, tasks, bids, payments } from './schema/index';
 import { hash } from 'bcrypt';
 
 async function seed() {
-  const [alice, bob, charlie, diana] = await db
+  const [alice, bob, charlie] = await db
     .insert(users)
     .values([
       {

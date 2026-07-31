@@ -19,7 +19,9 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "stripe": "^16.0.0",
-    "drizzle-orm": "^0.36.0"
+    "drizzle-orm": "^0.36.0",
+    "cors": "^2.8.5",
+    "@repo/types": "workspace:*"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
@@ -27,6 +29,7 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.7",
+    "@types/cors": "^2.8.17",
     "@types/node": "^22.10.0",
     "typescript": "^5.3.3",
     "tsx": "^4.19.2",

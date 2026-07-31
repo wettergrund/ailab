@@ -1,4 +1,4 @@
-import { WorkerAvailability, WorkerProfile } from "../types/worker.types";
+import { WorkerAvailability, WorkerProfile } from '../types/worker.types';
 
 export interface AvailabilityCheckResult {
   worker_id: string;
@@ -12,12 +12,14 @@ export function checkAvailability(
   requiredHours: number,
   maxConcurrentTasks: number = 3
 ): AvailabilityCheckResult {
-  const currentLoad = (worker.current_hours_this_week / worker.max_hours_per_week) * 100;
-  const remainingHours = worker.max_hours_per_week - worker.current_hours_this_week;
+  const currentLoad =
+    (worker.current_hours_this_week / worker.max_hours_per_week) * 100;
+  const remainingHours =
+    worker.max_hours_per_week - worker.current_hours_this_week;
   const isBelowMaxConcurrent = worker.completed_tasks < maxConcurrentTasks;
 
   let isAvailable = false;
-  let reason = "";
+  let reason = '';
 
   if (remainingHours < requiredHours) {
     isAvailable = false;
@@ -30,7 +32,7 @@ export function checkAvailability(
     reason = `Worker is at ${currentLoad.toFixed(0)}% capacity`;
   } else {
     isAvailable = true;
-    reason = "Worker is available";
+    reason = 'Worker is available';
   }
 
   return {

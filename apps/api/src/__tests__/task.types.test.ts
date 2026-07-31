@@ -3,7 +3,7 @@ import {
   CreateTaskRequest,
   UpdateTaskRequest,
   TaskResponse,
-} from '../types/task.types';
+} from '@repo/types';
 
 describe('task types consistency', () => {
   it('has matching estimatedHours types between request and response', () => {

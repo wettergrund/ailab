@@ -1,18 +1,28 @@
-export interface CreatePaymentIntentRequest {
-  projectId: number;
-  amount: number;
-}
+import { z } from 'zod';
 
-export interface PaymentIntentResponse {
-  clientSecret: string;
-  paymentIntentId: string;
-}
+export const CreatePaymentIntentRequestSchema = z.object({
+  projectId: z.number().int().positive(),
+  amount: z.number().positive(),
+});
 
-export interface PaymentResponse {
-  id: number;
-  projectId: number;
-  amount: string;
-  status: string;
-  stripePaymentIntentId?: string;
-  createdAt: string;
-}
+export type CreatePaymentIntentRequest = z.infer<
+  typeof CreatePaymentIntentRequestSchema
+>;
+
+export const PaymentIntentResponseSchema = z.object({
+  clientSecret: z.string(),
+  paymentIntentId: z.string(),
+});
+
+export type PaymentIntentResponse = z.infer<typeof PaymentIntentResponseSchema>;
+
+export const PaymentResponseSchema = z.object({
+  id: z.number().int().positive(),
+  projectId: z.number().int().positive(),
+  amount: z.number().positive(),
+  status: z.string(),
+  stripePaymentIntentId: z.string().optional(),
+  createdAt: z.string().datetime(),
+});
+
+export type PaymentResponse = z.infer<typeof PaymentResponseSchema>;
