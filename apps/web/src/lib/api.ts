@@ -14,29 +14,21 @@ import type {
   PaymentResponse,
   BidResponse,
   CreateBidRequest,
+  UserResponse,
 } from '@repo/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  withCredentials: true,
 });
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       window.location.href = '/auth/login';
     }
     return Promise.reject(error);
@@ -50,6 +42,8 @@ export const authApi = {
     api.post<AuthResponse>('/api/auth/login', data),
   refresh: (refreshToken: string) =>
     api.post<{ accessToken: string }>('/api/auth/refresh', { refreshToken }),
+  logout: () => api.post('/api/auth/logout'),
+  me: () => api.get<UserResponse>('/api/auth/me'),
 };
 
 export const projectApi = {
@@ -90,12 +84,12 @@ export const paymentApi = {
 
 export const aiApi = {
   decompose: (taskDescription: string, maxSubtasks?: number) =>
-    api.post('http://localhost:3001/api/ai/decompose', {
+    api.post('/ai/decompose', {
       task_description: taskDescription,
       max_subtasks: maxSubtasks,
     }),
   matchWorker: (requiredSkills: string[], estimatedHours: number) =>
-    api.post('http://localhost:3001/api/ai/match-worker', {
+    api.post('/ai/match-worker', {
       required_skills: requiredSkills,
       estimated_hours: estimatedHours,
     }),

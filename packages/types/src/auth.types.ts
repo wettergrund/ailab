@@ -26,3 +26,9 @@ export interface RefreshRequest {
 export interface RefreshResponse {
   accessToken: string;
 }
+
+export interface UserResponse {
+  userId: number;
+  email: string;
+  role: string;
+}

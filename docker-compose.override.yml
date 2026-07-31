@@ -55,13 +55,11 @@ services:
     volumes:
       - ./apps/web:/app
       - /app/node_modules
-    ports:
-      - '3002:3002'
     environment:
       NODE_ENV: development
       PORT: 3002
-      NEXT_PUBLIC_API_URL: http://localhost:3000
-      NEXT_PUBLIC_AI_URL: http://localhost:3001
+      NEXT_PUBLIC_API_URL: http://localhost
+      NEXT_PUBLIC_AI_URL: http://localhost/ai
     depends_on:
       - api
       - ai-engine

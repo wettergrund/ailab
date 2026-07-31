@@ -1,6 +1,13 @@
 import { Router } from 'express';
-import { register, login, refresh } from '../controllers/auth.controller';
+import {
+  register,
+  login,
+  refresh,
+  logout,
+  me,
+} from '../controllers/auth.controller';
 import { validateBody } from '../middleware/validation';
+import { authMiddleware } from '../middleware/auth';
 import { z } from 'zod';
 
 const router: Router = Router();
@@ -23,5 +30,7 @@ const refreshSchema = z.object({
 router.post('/register', validateBody(registerSchema), register);
 router.post('/login', validateBody(loginSchema), login);
 router.post('/refresh', validateBody(refreshSchema), refresh);
+router.post('/logout', authMiddleware, logout);
+router.get('/me', authMiddleware, me);
 
 export default router;

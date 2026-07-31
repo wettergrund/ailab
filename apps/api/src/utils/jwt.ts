@@ -2,6 +2,14 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+if (!REFRESH_SECRET) {
+  throw new Error('REFRESH_SECRET environment variable is required');
+}
+
 const ACCESS_EXPIRY = '15m';
 const REFRESH_EXPIRY = '7d';
 

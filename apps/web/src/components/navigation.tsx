@@ -13,14 +13,27 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
+import { authApi } from '@/lib/api';
 
 export function Navigation() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const isAuthenticated =
-    typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
-  const userRole =
-    typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
+  const [user, setUser] = React.useState<{
+    userId: number;
+    email: string;
+    role: string;
+  } | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    authApi
+      .me()
+      .then((res) => setUser(res.data))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const isAuthenticated = !!user && !loading;
 
   const links = [
     { href: '/', label: 'Home' },
@@ -55,7 +68,7 @@ export function Navigation() {
         <div className="hidden md:flex items-center space-x-4">
           {isAuthenticated ? (
             <>
-              <Link href={`/dashboard/${userRole || 'client'}`}>
+              <Link href={`/dashboard/${user?.role || 'client'}`}>
                 <Button variant="ghost" size="sm">
                   Dashboard
                 </Button>
@@ -75,10 +88,9 @@ export function Navigation() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem disabled>Profile</DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => {
-                      localStorage.removeItem('accessToken');
-                      localStorage.removeItem('refreshToken');
-                      localStorage.removeItem('userRole');
+                    onClick={async () => {
+                      await authApi.logout();
+                      setUser(null);
                       window.location.href = '/auth/login';
                     }}
                   >
@@ -121,7 +133,12 @@ export function Navigation() {
             <Link
               key={link.href}
               href={link.href}
-              className="block py-2 text-sm font-medium text-muted-foreground hover:text-primary"
+              className={cn(
+                'block py-2 text-sm font-medium text-muted-foreground hover:text-primary',
+                pathname === link.href
+                  ? 'text-primary'
+                  : 'text-muted-foreground'
+              )}
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
@@ -130,7 +147,7 @@ export function Navigation() {
           {isAuthenticated ? (
             <>
               <Link
-                href={`/dashboard/${userRole || 'client'}`}
+                href={`/dashboard/${user?.role || 'client'}`}
                 className="block py-2 text-sm font-medium text-muted-foreground hover:text-primary"
                 onClick={() => setMobileOpen(false)}
               >
@@ -138,10 +155,9 @@ export function Navigation() {
               </Link>
               <button
                 className="block py-2 text-sm font-medium text-muted-foreground hover:text-primary"
-                onClick={() => {
-                  localStorage.removeItem('accessToken');
-                  localStorage.removeItem('refreshToken');
-                  localStorage.removeItem('userRole');
+                onClick={async () => {
+                  await authApi.logout();
+                  setUser(null);
                   window.location.href = '/auth/login';
                 }}
               >

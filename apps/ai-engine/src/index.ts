@@ -14,150 +14,173 @@ import {
 import { AIStatus } from './types/status.types';
 import { WorkerProfile } from './types/worker.types';
 
-const app: Express = express();
-app.use(express.json());
+export function createApp(): Express {
+  const app = express();
+  app.use(express.json());
 
-const openai = new OpenAIService({
-  apiKey: process.env.OPENAI_API_KEY ?? '',
-  model: process.env.OPENAI_MODEL ?? 'gpt-4o',
-  temperature: 0.7,
-  maxTokens: 4096,
-});
+  const openai = new OpenAIService({
+    apiKey: process.env.OPENAI_API_KEY ?? '',
+    model: process.env.OPENAI_MODEL ?? 'gpt-4o',
+    temperature: 0.7,
+    maxTokens: 4096,
+  });
 
-const queue = new QueueService({
-  redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
-  prefix: 'ai_engine',
-  defaultMaxAttempts: 3,
-  visibilityTimeout: 30,
-});
+  const queue = new QueueService({
+    redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
+    prefix: 'ai_engine',
+    defaultMaxAttempts: 3,
+    visibilityTimeout: 30,
+  });
 
-const taskQueue = new TaskQueue(queue, openai);
+  const taskQueue = new TaskQueue(queue, openai);
 
-const startTime = Date.now();
-let totalDecompositions = 0;
-let totalWorkerMatches = 0;
+  const startTime = Date.now();
+  let totalDecompositions = 0;
+  let totalWorkerMatches = 0;
 
-app.get('/api/ai/status', (_req: Request, res: Response) => {
-  const status: AIStatus = {
-    service: 'ai-engine',
-    version: '0.1.0',
-    status: 'healthy',
-    uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
-    openai_configured: openai.isConfigured(),
-    redis_configured: true,
-    models: [process.env.OPENAI_MODEL ?? 'gpt-4o'],
-    total_decompositions: totalDecompositions,
-    total_worker_matches: totalWorkerMatches,
-  };
-  res.json(status);
-});
-
-app.post('/api/ai/decompose', async (req: Request, res: Response) => {
-  try {
-    const request = req.body as DecomposeRequest;
-
-    const validation = validateDecomposeRequest(request);
-    if (!validation.success) {
-      res
-        .status(400)
-        .json({ error: 'Invalid request', details: validation.error });
-      return;
-    }
-
-    const analyzedTask = analyzeTask(request);
-    const generationResult = generateSubtasks(
-      analyzedTask,
-      request.max_subtasks,
-      request.target_hours_per_subtask
-    );
-
-    const response: DecomposeResponse = {
-      task_id: `task_${Date.now()}`,
-      original_task: request.task_description,
-      subtasks: generationResult.subtasks,
-      total_estimated_hours: generationResult.total_hours,
-      required_skills: extractRequiredSkills(generationResult.subtasks),
-      decomposition_quality: generationResult.quality,
-      notes: `Analyzed task with complexity score ${analyzedTask.estimated_complexity.complexity_score}`,
-    };
-
-    totalDecompositions++;
-    res.json(response);
-  } catch (error) {
-    res.status(500).json({
-      error: 'Decomposition failed',
-      details: error instanceof Error ? error.message : String(error),
+  app.get('/health', (_req: Request, res: Response) => {
+    res.json({
+      status: 'healthy',
+      service: 'ai-engine',
+      uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
+      timestamp: new Date().toISOString(),
     });
-  }
-});
+  });
 
-app.post('/api/ai/match-worker', async (req: Request, res: Response) => {
-  try {
-    const request = req.body as MatchWorkerRequest;
+  app.get('/api/health', (_req: Request, res: Response) => {
+    res.json({
+      status: 'healthy',
+      service: 'ai-engine',
+      uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
+      timestamp: new Date().toISOString(),
+    });
+  });
 
-    const validation = validateMatchWorkerRequest(request);
-    if (!validation.success) {
-      res
-        .status(400)
-        .json({ error: 'Invalid request', details: validation.error });
-      return;
-    }
+  app.get('/api/ai/status', (_req: Request, res: Response) => {
+    const status: AIStatus = {
+      service: 'ai-engine',
+      version: '0.1.0',
+      status: 'healthy',
+      uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
+      openai_configured: openai.isConfigured(),
+      redis_configured: true,
+      models: [process.env.OPENAI_MODEL ?? 'gpt-4o'],
+      total_decompositions: totalDecompositions,
+      total_worker_matches: totalWorkerMatches,
+    };
+    res.json(status);
+  });
 
-    const workers = getMockWorkers();
-    const skillMatches = rankWorkers(
-      request.required_skills,
-      workers,
-      request.max_results
-    );
-    const availabilities = filterAvailableWorkers(
-      workers,
-      request.estimated_hours
-    );
+  app.post('/api/ai/decompose', async (req: Request, res: Response) => {
+    try {
+      const request = req.body as DecomposeRequest;
 
-    const suggestions: MatchWorkerResponse['suggestions'] = skillMatches.map(
-      (match) => {
-        const worker = workers.find((w) => w.worker_id === match.worker_id);
-        const availability = availabilities.find(
-          (a) => a.worker_id === match.worker_id
-        );
-        return {
-          worker_id: match.worker_id,
-          name: worker?.name ?? 'Unknown',
-          skills: worker?.skills ?? [],
-          match_score: match.match_score,
-          estimated_hours: request.estimated_hours,
-          availability_status: availability?.is_available
-            ? 'available'
-            : availability && availability.available_hours > 0
-              ? 'busy'
-              : 'unavailable',
-          current_load: worker
-            ? (worker.current_hours_this_week / worker.max_hours_per_week) * 100
-            : 0,
-          reason:
-            match.missing_skills.length > 0
-              ? `Missing skills: ${match.missing_skills.join(', ')}`
-              : 'Good skill match',
-        };
+      const validation = validateDecomposeRequest(request);
+      if (!validation.success) {
+        res
+          .status(400)
+          .json({ error: 'Invalid request', details: validation.error });
+        return;
       }
-    );
 
-    const response: MatchWorkerResponse = {
-      subtask_id: request.subtask_id,
-      suggestions,
-      total_candidates: workers.length,
-      match_strategy: 'skill-weighted with availability and load balancing',
-    };
+      const analyzedTask = analyzeTask(request);
+      const generationResult = generateSubtasks(
+        analyzedTask,
+        request.max_subtasks,
+        request.target_hours_per_subtask
+      );
 
-    totalWorkerMatches++;
-    res.json(response);
-  } catch (error) {
-    res.status(500).json({
-      error: 'Worker matching failed',
-      details: error instanceof Error ? error.message : String(error),
-    });
-  }
-});
+      const response: DecomposeResponse = {
+        task_id: `task_${Date.now()}`,
+        original_task: request.task_description,
+        subtasks: generationResult.subtasks,
+        total_estimated_hours: generationResult.total_hours,
+        required_skills: extractRequiredSkills(generationResult.subtasks),
+        decomposition_quality: generationResult.quality,
+        notes: `Analyzed task with complexity score ${analyzedTask.estimated_complexity.complexity_score}`,
+      };
+
+      totalDecompositions++;
+      res.json(response);
+    } catch (error) {
+      res.status(500).json({
+        error: 'Decomposition failed',
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
+  app.post('/api/ai/match-worker', async (req: Request, res: Response) => {
+    try {
+      const request = req.body as MatchWorkerRequest;
+
+      const validation = validateMatchWorkerRequest(request);
+      if (!validation.success) {
+        res
+          .status(400)
+          .json({ error: 'Invalid request', details: validation.error });
+        return;
+      }
+
+      const workers = getMockWorkers();
+      const skillMatches = rankWorkers(
+        request.required_skills,
+        workers,
+        request.max_results
+      );
+      const availabilities = filterAvailableWorkers(
+        workers,
+        request.estimated_hours
+      );
+
+      const suggestions: MatchWorkerResponse['suggestions'] = skillMatches.map(
+        (match) => {
+          const worker = workers.find((w) => w.worker_id === match.worker_id);
+          const availability = availabilities.find(
+            (a) => a.worker_id === match.worker_id
+          );
+          return {
+            worker_id: match.worker_id,
+            name: worker?.name ?? 'Unknown',
+            skills: worker?.skills ?? [],
+            match_score: match.match_score,
+            estimated_hours: request.estimated_hours,
+            availability_status: availability?.is_available
+              ? 'available'
+              : availability && availability.available_hours > 0
+                ? 'busy'
+                : 'unavailable',
+            current_load: worker
+              ? (worker.current_hours_this_week / worker.max_hours_per_week) *
+                100
+              : 0,
+            reason:
+              match.missing_skills.length > 0
+                ? `Missing skills: ${match.missing_skills.join(', ')}`
+                : 'Good skill match',
+          };
+        }
+      );
+
+      const response: MatchWorkerResponse = {
+        subtask_id: request.subtask_id,
+        suggestions,
+        total_candidates: workers.length,
+        match_strategy: 'skill-weighted with availability and load balancing',
+      };
+
+      totalWorkerMatches++;
+      res.json(response);
+    } catch (error) {
+      res.status(500).json({
+        error: 'Worker matching failed',
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
+  return app;
+}
 
 function validateDecomposeRequest(request: unknown): {
   success: boolean;
@@ -282,6 +305,7 @@ function getMockWorkers(): WorkerProfile[] {
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10);
 
+const app = createApp();
 app.listen(PORT, () => {
   console.log(`AI Engine service running on port ${PORT}`);
 });

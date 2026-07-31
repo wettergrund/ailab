@@ -1,4 +1,6 @@
 import express, { Express } from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
@@ -339,8 +341,18 @@ export function setupSwagger(app: Express): void {
 
 export function createApp(): Express {
   const app = express();
+  app.use(cors({ origin: true, credentials: true }));
+  app.use(cookieParser());
   app.use(express.json());
   app.use(rateLimiter);
+  app.get('/health', (_req, res) => {
+    res.json({
+      status: 'healthy',
+      service: 'api',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+    });
+  });
   app.use('/api', routes);
   app.use(errorHandler);
   setupSwagger(app);

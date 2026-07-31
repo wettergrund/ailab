@@ -29,9 +29,6 @@ export default function LoginPage() {
     setError('');
     try {
       const res = await authApi.login({ email, password });
-      localStorage.setItem('accessToken', res.data.accessToken);
-      localStorage.setItem('refreshToken', res.data.refreshToken);
-      localStorage.setItem('userRole', res.data.user.role);
       router.push(`/dashboard/${res.data.user.role}`);
     } catch {
       setError('Login failed. Please check your credentials.');

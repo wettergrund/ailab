@@ -37,9 +37,6 @@ export default function RegisterPage() {
     setError('');
     try {
       const res = await authApi.register({ email, password, role });
-      localStorage.setItem('accessToken', res.data.accessToken);
-      localStorage.setItem('refreshToken', res.data.refreshToken);
-      localStorage.setItem('userRole', res.data.user.role);
       router.push(`/dashboard/${res.data.user.role}`);
     } catch {
       setError('Registration failed. Please try again.');
