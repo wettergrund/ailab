@@ -21,6 +21,7 @@
     "stripe": "^16.0.0",
     "drizzle-orm": "^0.36.0",
     "cors": "^2.8.5",
+    "@repo/db": "workspace:*",
     "@repo/types": "workspace:*"
   },
   "devDependencies": {
